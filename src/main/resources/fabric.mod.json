@@ -9,7 +9,7 @@
 	],
 	"contact": {
 		"homepage": "?",
-		"sources": "?"
+		"sources": "https://github.com/fr0zert/timeoutfix"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/timeoutfix/icon.png",
