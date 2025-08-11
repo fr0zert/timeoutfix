@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "fr0zert.timeoutfix.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ServerLoginNetworkHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "timeoutfix",
+	"version": "${version}",
+	"name": "TimeOutFix",
+	"description": "This mod allow you customize login timeout time",
+	"authors": [
+		"fr0zert"
+	],
+	"contact": {
+		"homepage": "?",
+		"sources": "?"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/timeoutfix/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"fr0zert.timeoutfix.TimeOutFix"
+		]
+	},
+	"mixins": [
+		"timeoutfix.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.7",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
