@@ -39,14 +39,17 @@ jobs:
           echo "Latest release version: $LATEST_VERSION"
           echo "Current mod version: ${{ env.version }}"
           if [ "$LATEST_VERSION" = "${{ env.version }}" ]; then
-            echo "✅ Version $LATEST_VERSION already released. Skipping."
-            exit 0
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "skip=false" >> $GITHUB_ENV
           fi
 
       - name: Build mod
+        if: env.skip == 'false'
         run: ./gradlew build
 
       - name: Verify built jar exists
+        if: env.skip == 'false'
         run: |
           JAR_PATH="build/libs/timeoutfix-${{ env.version }}-release.jar"
           if [ ! -f "$JAR_PATH" ]; then
@@ -56,11 +59,11 @@ jobs:
           echo "jar_path=$JAR_PATH" >> $GITHUB_ENV
 
       - name: Create GitHub Release
+        if: env.skip == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.version }}
           name: "TimeoutFix ${{ env.version }}"
-          body: "Automated release of TimeoutFix version ${{ env.version }}"
           files: ${{ env.jar_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
