@@ -13,31 +13,60 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
-      - name: setup jdk
+      - uses: actions/checkout@v4
+
+      - name: Check commit message
+        id: check_commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Last commit message: $COMMIT_MSG"
+          if [[ "$COMMIT_MSG" == *"New release"* ]]; then
+            echo "run_build=true" >> $GITHUB_ENV
+          else
+            echo "run_build=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip if not release commit
+        if: env.run_build == 'false'
+        run: |
+          echo "No 'release' keyword in commit message. Skipping."
+          exit 0
+
+      - name: Read version info
+        id: get_version
+        run: |
+          MOD_VERSION=$(grep "^mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          MC_VERSION=$(grep "^minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          echo "version=$MOD_VERSION" >> $GITHUB_ENV
+          echo "mc_version=$MC_VERSION" >> $GITHUB_ENV
+          echo "major_version=${MOD_VERSION%%.*}" >> $GITHUB_ENV
+
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
+          distribution: 'temurin'
 
-      - name: Read version from gradle.properties
-        id: get_version
-        run: |
-          VERSION=$(grep "^mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
-          echo "version=$VERSION" >> $GITHUB_ENV
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ env.major_version }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ env.major_version }}-
 
-      - name: Check latest GitHub release
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - run: chmod +x ./gradlew
+
+      - name: Check latest release
         id: check_release
         run: |
           LATEST_VERSION=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest \
             | grep '"tag_name":' | cut -d'"' -f4 | sed 's/^v//')
           echo "Latest release version: $LATEST_VERSION"
-          echo "Current mod version: ${{ env.version }}"
           if [ "$LATEST_VERSION" = "${{ env.version }}" ]; then
             echo "skip=true" >> $GITHUB_ENV
           else
@@ -48,10 +77,10 @@ jobs:
         if: env.skip == 'false'
         run: ./gradlew build
 
-      - name: Verify built jar exists
+      - name: Verify JAR
         if: env.skip == 'false'
         run: |
-          JAR_PATH="build/libs/timeoutfix-${{ env.version }}-release.jar"
+          JAR_PATH="build/libs/TimeOutFix-${{ env.version }}-${{ env.mc_version }}.jar"
           if [ ! -f "$JAR_PATH" ]; then
             echo "❌ File $JAR_PATH not found!"
             exit 1

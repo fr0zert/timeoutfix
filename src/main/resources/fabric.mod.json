@@ -11,7 +11,7 @@
 		"homepage": "?",
 		"sources": "https://github.com/fr0zert/timeoutfix"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/timeoutfix/icon.png",
 	"environment": "*",
 	"entrypoints": {
