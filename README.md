@@ -6,10 +6,10 @@
 
 1. Drop the mod `.jar` into your server’s `mods` folder.
 2. Start and stop the server. (so default config file is created) / or create manually before restart
-3. Edit the config file (`config/TimeOutFixConfig.toml`) to set your preferred timeout in **server ticks**.
+3. Edit the config file (`config/TimeOutFixConfig.properties`) to set your preferred timeout in **server ticks**.
 ```toml
 # Config uses tisks, so if u want specify second just do (seconds * 20) // default value is 600 
-LoginTimeOut = 600
+login_time_out=1800
 ```
 4. Start / Restart the server.
 
